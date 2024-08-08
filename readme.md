@@ -44,8 +44,3 @@ AccountMeta { pubkey: PubKey("Account2"), is_signer: false, is_writable: true }
 AccountMeta { pubkey: PubKey("Account1"), is_signer: true, is_writable: true }
 ```
 
-## Conclusion
-
-Based on the test results, we can draw conclusions about the performance and efficiency of the nested for loop and hashmap implementations. [Add your conclusions here]
-
-Please refer to the code in this repository for more details on the test implementation.
