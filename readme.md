@@ -1,6 +1,6 @@
 # Nested For Loop vs Hashmap Test
 
-This repository contains a test implementation of a nested for loop against a hashmap. The purpose of this test is to compare the performance and efficiency of these two approaches when working with data.
+This repository contains a test implementation of a nested for loop against a hashmap. 
 
 ## Test Description
 
