@@ -2,10 +2,6 @@
 
 This repository contains a test implementation of a nested for loop against a hashmap. 
 
-## Test Description
-
-In this test, we will be using a sample dataset to evaluate the performance of a nested for loop and a hashmap implementation. The dataset consists of [describe your dataset here].
-
 ## Test Results
 
 The test results are as follows (Ran on Macbook Pro M1, 32GB RAM):
