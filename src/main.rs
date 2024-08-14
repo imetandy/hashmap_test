@@ -48,6 +48,37 @@ fn deduplicate_accounts_hashmap(accounts: Vec<AccountMeta>) -> Vec<AccountMeta> 
     account_index_map.into_values().collect()
 }
 
+
+fn deduplicate_accounts_hashmap_as_tuple(instruction_accounts: Vec<AccountMeta>) -> Vec<AccountMeta> {
+
+     // HashMap to store the final results.
+     let mut results: HashMap<PubKey, (usize, AccountMeta, Vec<usize>)> = HashMap::new();
+
+     // Counter for assigning new sequential index
+     let mut new_index = 0;
+ 
+     for (index, account_meta) in instruction_accounts.iter().enumerate() {
+         let entry = results.entry(account_meta.pubkey.clone()).or_insert_with(|| {
+             let idx = new_index;
+             new_index += 1;  // Increment the new index for each unique pubkey
+             (idx, account_meta.clone(), vec![])
+         });
+ 
+         // Update the stored AccountMeta if the new one has higher is_signer or is_writable.
+         if account_meta.is_signer || account_meta.is_writable {
+             entry.1.is_signer |= account_meta.is_signer;
+             entry.1.is_writable |= account_meta.is_writable;
+         }
+ 
+         // Record the position of the AccountMeta in the original vector.
+         entry.2.push(index);
+     }
+
+     // Return the deduplicated accounts
+     results.into_values().map(|(_, account_meta, _)| account_meta).collect()
+}
+
+
 fn main() {
     let instruction_accounts = vec![
         AccountMeta {
@@ -58,6 +89,16 @@ fn main() {
         AccountMeta {
             pubkey: PubKey("Account2".to_string()),
             is_signer: false,
+            is_writable: false,
+        },
+        AccountMeta {
+            pubkey: PubKey("Account3".to_string()),
+            is_signer: false,
+            is_writable: false,
+        },
+        AccountMeta {
+            pubkey: PubKey("Account2".to_string()),
+            is_signer: true,
             is_writable: true,
         },
         AccountMeta {
@@ -67,6 +108,14 @@ fn main() {
         },
     ];
 
+    let start_hashmap_with_tuple = Instant::now();
+    let deduplicated_accounts_hashmap_with_tuple = deduplicate_accounts_hashmap_as_tuple(instruction_accounts.clone());
+    let duration_hashmap_with_tuple = start_hashmap_with_tuple.elapsed();
+    println!("HashMap Duration: {:?}", duration_hashmap_with_tuple);
+    println!("Deduplicated Instruction Accounts with HashMap:");
+    for account in deduplicated_accounts_hashmap_with_tuple {
+        println!("{:?}", account);
+    }
 
     let start = Instant::now();
     let deduplicated_accounts_nested = deduplicate_accounts_nested(instruction_accounts.clone());
@@ -77,15 +126,13 @@ fn main() {
         println!("{:?}", account);
     }
 
-    let start = Instant::now();
-    let deduplicated_accounts_hashmap = deduplicate_accounts_hashmap(instruction_accounts);
-    let duration_hashmap = start.elapsed();
+    let start_hashmap = Instant::now();
+    let deduplicated_accounts_hashmap = deduplicate_accounts_hashmap(instruction_accounts.clone());
+    let duration_hashmap = start_hashmap.elapsed();
     println!("HashMap Duration: {:?}", duration_hashmap);
     println!("Deduplicated Instruction Accounts with HashMap:");
     for account in deduplicated_accounts_hashmap {
         println!("{:?}", account);
     }
-
-
 
 }
